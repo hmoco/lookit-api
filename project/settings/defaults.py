@@ -50,8 +50,12 @@ INSTALLED_APPS = [
     'bootstrap3',
     'debug_toolbar',
     'ace_overlay',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 
     # our stuff
+    'osf_oauth2_adapter',
     'api',
     'web',
     'accounts',
@@ -81,6 +85,7 @@ INTERNAL_IPS = ['127.0.0.1', ]
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # this is default
     'guardian.backends.ObjectPermissionBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
 ROOT_URLCONF = 'project.urls'
@@ -174,7 +179,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-SITE_ID = 1
+SITE_ID = 2
 
 
 # Static files (CSS, JavaScript, Images)
@@ -183,3 +188,33 @@ SITE_ID = 1
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+LOGIN_REDIRECT_URL = os.environ.get('LOGIN_REDIRECT_URL', 'http://localhost:8000/')
+ACCOUNT_LOGOUT_REDIRECT_URL = os.environ.get('ACCOUNT_LOGOUT_REDIRECT_URL', '/api/')
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'id'
+SOCIALACCOUNT_ADAPTER = 'osf_oauth2_adapter.views.OSFOAuth2Adapter'
+SOCIALACCOUNT_PROVIDERS = \
+    {'osf':
+        {
+            'METHOD': 'oauth2',
+            'SCOPE': ['osf.users.profile_read'],
+            'AUTH_PARAMS': {'access_type': 'offline'},
+            # 'FIELDS': [
+            #     'id',
+            #     'email',
+            #     'name',
+            #     'first_name',
+            #     'last_name',
+            #     'verified',
+            #     'locale',
+            #     'timezone',
+            #     'link',
+            #     'gender',
+            #     'updated_time'],
+            # 'EXCHANGE_TOKEN': True,
+            # 'LOCALE_FUNC': 'path.to.callable',
+            # 'VERIFIED_EMAIL': False,
+            # 'VERSION': 'v2.4'
+        }
+     }
+

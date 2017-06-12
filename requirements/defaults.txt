@@ -18,3 +18,4 @@ psycopg2==2.7.1
 pydenticon==0.3
 transitions==0.5.2
 Werkzeug==0.12.1
+django-allauth==0.32.0

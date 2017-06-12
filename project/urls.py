@@ -23,6 +23,7 @@ from api import urls as api_urls
 from exp import urls as exp_urls
 from project import settings
 from web import urls as web_urls
+from osf_oauth2_adapter import views as osf_oauth2_adapter_views
 
 favicon_view = RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)
 
@@ -31,6 +32,9 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^exp/', include(exp_urls, namespace='exp')),
     url(r'^api/', include(api_urls)),
+    url(r'^accounts/social/login/cancelled/', osf_oauth2_adapter_views.login_errored_cancelled),
+    url(r'^accounts/social/login/error/', osf_oauth2_adapter_views.login_errored_cancelled),
+    url(r'^accounts/', include('allauth.urls')),
     url(r'^', include(web_urls)),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
