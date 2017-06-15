@@ -51,6 +51,9 @@ class Study(models.Model):
     def __str__(self):
         return f'<Study: {self.name}>'
 
+    class JSONAPIMeta:
+        lookup_field = 'uuid'
+
     class Meta:
         permissions = (
             ('can_view', 'Can View'),

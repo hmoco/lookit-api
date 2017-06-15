@@ -21,5 +21,6 @@ class UserViewSet(views.ModelViewSet):
 
 
 class StudyViewSet(views.ModelViewSet):
+    lookup_field = 'uuid'
     queryset = Study.objects.filter(state='active')
     serializer_class = StudySerializer
