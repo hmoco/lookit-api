@@ -1,15 +1,16 @@
 import uuid
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.text import slugify
-from guardian.shortcuts import assign_perm
-from transitions.extensions import GraphMachine as Machine
-from django.contrib.postgres.fields import ArrayField
 
-from accounts.models import DemographicData, Organization, Child, User
+from accounts.models import Child, DemographicData, Organization, User
+from guardian.shortcuts import assign_perm
 from project.fields.datetime_aware_jsonfield import DateTimeAwareJSONField
+from transitions.extensions import GraphMachine as Machine
+
 from . import workflow
 
 
@@ -75,6 +76,10 @@ class Study(models.Model):
             ('can_view_video_responses', 'Can View Video Responses'),
             ('can_view_demographics', 'Can View Demographics'),
         )
+
+    class JSONAPIMeta:
+        resource_name = 'studies'
+        lookup_field = 'uuid'
 
     @property
     def begin_date(self):
@@ -191,6 +196,7 @@ def study_post_save(sender, **kwargs):
 
 
 class Response(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4)
     study = models.ForeignKey(
         Study, on_delete=models.DO_NOTHING,
         related_name='responses'
@@ -214,8 +220,13 @@ class Response(models.Model):
             ('view_response', 'View Response'),
         )
 
+    class JSONAPIMeta:
+        resource_name = 'responses'
+        lookup_field = 'uuid'
+
 
 class Log(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
 
@@ -238,7 +249,15 @@ class StudyLog(Log):
     def __str__(self):
         return f'<StudyLog: {self.action} on {self.study.name} at {self.created_at} by {self.user.username}'  # noqa
 
+    class JSONAPIMeta:
+        resource_name = 'study-logs'
+        lookup_field = 'uuid'
+
 
 class ResponseLog(Log):
     action = models.CharField(max_length=128)
     response = models.ForeignKey(Response, on_delete=models.DO_NOTHING)
+
+    class JSONAPIMeta:
+        resource_name = 'response-logs'
+        lookup_field = 'uuid'
